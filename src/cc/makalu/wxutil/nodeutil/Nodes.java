@@ -25,14 +25,18 @@ public class Nodes {
         this.htmlStrOrPathOrURi = htmlStrOrPathOrURi;
         NodeUtil nodeUtil = new NodeUtil();
         mapListNode = nodeUtil.getNodeS(htmlStrOrPathOrURi);
+        this.listNode = getListNodeAllPr();
     }
 
+    public List<Node> getListNodeAll(){
+        return listNode;
+    }
 
     /**
      * 获取所有节点信息
      * @return
      */
-    public List<Node> getListNodeAll(){
+    private List<Node> getListNodeAllPr(){
 
         for (Node nodeStartS:mapListNode.get("nodeStartS")) {
 
