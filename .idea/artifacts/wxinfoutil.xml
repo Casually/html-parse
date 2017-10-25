@@ -1,0 +1,9 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="wxinfoutil">
+    <output-path>$PROJECT_DIR$/out/artifacts/wxinfoutil</output-path>
+    <root id="archive" name="wxinfoutil.jar">
+      <element id="library" level="project" name="lib" />
+      <element id="module-output" name="wxutil" />
+    </root>
+  </artifact>
+</component>
