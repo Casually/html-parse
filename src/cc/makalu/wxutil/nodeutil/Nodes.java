@@ -1,6 +1,5 @@
 package cc.makalu.wxutil.nodeutil;
 
-import javax.swing.undo.CannotUndoException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
