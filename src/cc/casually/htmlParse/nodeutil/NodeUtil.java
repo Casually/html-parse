@@ -16,7 +16,7 @@ import java.util.regex.Pattern;
 public class NodeUtil {
 
     private static String nodePattern = "<[/\\w]{0,10}+";
-    private static String singlePattern = "<(input|hr|br|img|meta|\\!DOCTYPE|link|\\!doctype)[\\w\\s=\"'/\\.\\-_:\\(\\)\\u4E00-\\u9FFF]*>";
+    private static String singlePattern = "<(input|hr|br|img|meta|\\!DOCTYPE|link|\\!doctype)[\\w\\s=\"'/\\.\\-_:;\\(\\)\\u4E00-\\u9FFF]*>";
 
     private static Pattern patternNodes = Pattern.compile(nodePattern);
     private static Pattern patternSingleTagS = Pattern.compile(singlePattern);
