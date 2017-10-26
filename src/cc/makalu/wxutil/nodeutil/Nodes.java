@@ -28,6 +28,10 @@ public class Nodes {
         this.listNode = getListNodeAllPr();
     }
 
+    /**
+     * 获取所有的节点
+     * @return
+     */
     public List<Node> getListNodeAll(){
         return listNode;
     }
@@ -108,6 +112,8 @@ public class Nodes {
 
             }
         }
+        //加载单标签
+        this.listNode.addAll(mapListNode.get("singleTagS"));
         return listNode;
     }
 

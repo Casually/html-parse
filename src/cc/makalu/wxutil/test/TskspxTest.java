@@ -11,6 +11,7 @@ public class TskspxTest {
         tskspx.loginSystem("18710716894","123456");
         tskspx.intoSystem();
         tskspx.choiceQuestionType("768007");
+
         for (int i = 1;i<632;i++){
             String topicHtmlstr = tskspx.getTopicHtmlStr("020553",String.valueOf(i),"6","2033073");
             Nodes nodes = new Nodes(topicHtmlstr);

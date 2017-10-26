@@ -16,8 +16,10 @@ import java.util.regex.Pattern;
 public class NodeUtil {
 
     private static String nodePattern = "<[/\\w]{0,10}+";
+    private static String singlePattern = "<(input|hr|br|img|meta|\\!DOCTYPE|link|\\!doctype)[\\w\\s=\"'/\\.\\-_:\\(\\)\\u4E00-\\u9FFF]*>";
 
     private static Pattern patternNodes = Pattern.compile(nodePattern);
+    private static Pattern patternSingleTagS = Pattern.compile(singlePattern);
 
     /**
      * 获取所有的节点标签信息
@@ -56,6 +58,23 @@ public class NodeUtil {
         Map<String,List<Node>> result = new HashMap<>();
         result.put("nodeStartS",nodeStartS);
         result.put("nodeEndS",nodeEndS);
+
+        //处理单标签
+        matcher = patternSingleTagS.matcher(str);
+        List<Node> singleTagS = new ArrayList<>();
+        while (matcher.find()){
+            Node node = new Node();
+            String nodeTag = matcher.group();
+            int start = matcher.start();
+            node.setTag(nodeTag.split(" ")[0] + ">");
+            node.setStart(start);
+            node.setEntiretyNum(entiretyNum);
+            node.setContext(nodeTag);
+            singleTagS.add(node);
+            entiretyNum++;
+        }
+        result.put("singleTagS",singleTagS);
+        //获取单标签信息
         return result;
     }
 

@@ -1,7 +1,18 @@
 package cc.makalu.wxutil.nodeutil;
 
-import java.util.HashMap;
+import cc.makalu.wxutil.util.Util;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+/**
+ * 节点实体类
+ * @user Administrator
+ * @author
+ * @CreateTime 2017/10/26 16:51
+ */
 public class Node {
 
     private String tag;
@@ -10,6 +21,8 @@ public class Node {
     private int num;
     private int entiretyNum;
     private Node node;
+    private static String nodeAttributePatternStr = "\\w*(=\")[\\w\\s/\\?#&;\\$\\.\\+,=\\-_:\\(\\)\\u4E00-\\u9FFF]*\"";
+    private static Pattern nodeAttributePattern = Pattern.compile(nodeAttributePatternStr);
 
     public String getTag() {
         return tag;
@@ -57,6 +70,70 @@ public class Node {
 
     public void setNode(Node node) {
         this.node = node;
+    }
+
+    /**
+     * 获取标签所有的属性（不包含DOM事件）
+     * @return
+     */
+    public List<NodeAttribute> getAttribute(){
+        Matcher matcher = nodeAttributePattern.matcher(getContext());
+        List<NodeAttribute> listNodeAttribute = new ArrayList<>();
+        while (matcher.find()){
+            String nodeAttributeStr = matcher.group();
+            NodeAttribute nodeAttribute = new NodeAttribute();
+            if (nodeAttributeStr.indexOf("=\"") != -1){
+                nodeAttribute.setName(nodeAttributeStr.substring(0,nodeAttributeStr.indexOf("=\"")));
+                nodeAttribute.setValue(nodeAttributeStr.substring(nodeAttributeStr.indexOf("=\"") + 2,nodeAttributeStr.lastIndexOf("\"")));
+            }else {
+                nodeAttribute.setName(nodeAttributeStr.substring(0,nodeAttributeStr.indexOf("='")));
+                nodeAttribute.setValue(nodeAttributeStr.substring(nodeAttributeStr.indexOf("='") + 2,nodeAttributeStr.lastIndexOf("'")));
+            }
+            listNodeAttribute.add(nodeAttribute);
+        }
+
+        return listNodeAttribute;
+    }
+
+    /**
+     * 获取指定属性值
+     * @param attribute
+     * @return
+     */
+    public String getAttributeValue(String attribute){
+        boolean isFlag = Util.findInSet(attribute,HtmlStaticData.FUNCTIONATTRIBUTETYPE);
+        String navps = "";
+        if(isFlag){
+            if(getContext().indexOf(attribute + "=\"") != -1){
+                navps = String.format("%s=(\")[\\w\\s=/#\"'\\?&;\\$\\+,\\.\\-_:\\(\\)\\u4E00-\\u9FFF]*(\")",attribute);
+            }else {
+                navps = String.format("%s=(')[\\w\\s=/#\"'\\?&;\\$\\+,\\.\\-_:\\(\\)\\u4E00-\\u9FFF]*(')",attribute);
+            }
+        }else{
+            if(getContext().indexOf(attribute + "=\"") != -1){
+                navps = String.format("%s=(\")[\\w\\s=/#\\?&;\\$\\.\\+,\\-_:\\(\\)\\u4E00-\\u9FFF]*(\")",attribute);
+            }else {
+                navps = String.format("%s=(')[\\w\\s=/#\\?&;\\$\\.\\+,\\-_:\\(\\)\\u4E00-\\u9FFF]*(')",attribute);
+            }
+        }
+        Pattern nodeAttributeValuePattern = Pattern.compile(navps);
+        Matcher matcher = nodeAttributeValuePattern.matcher(getContext());
+        while (matcher.find()){
+            String attributeAndValue = matcher.group();
+            if (!"".equals(attribute)){
+                if(isFlag){
+                    return attributeAndValue.indexOf("=\"") != -1 ?
+                            attributeAndValue.substring(attributeAndValue.indexOf("=\"")
+                                    + 2,attributeAndValue.lastIndexOf(attributeAndValue.indexOf("\" ") != -1 ? "\" ":"\""))
+                            :attributeAndValue.substring(attributeAndValue.indexOf("='")
+                                    + 2,attributeAndValue.lastIndexOf(attributeAndValue.indexOf("' ") != -1 ? "' ":"'"));
+                }
+                return attributeAndValue.indexOf("=\"") != -1 ?
+                        attributeAndValue.substring(attributeAndValue.indexOf("=\"") + 2,attributeAndValue.lastIndexOf("\""))
+                        :attributeAndValue.substring(attributeAndValue.indexOf("='") + 2,attributeAndValue.lastIndexOf("'"));
+            }
+        }
+        return null;
     }
 
     @Override

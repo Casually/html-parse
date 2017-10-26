@@ -168,4 +168,20 @@ public class Util {
         Pattern pattern = compile("[0-9a-zA-Z_]*");
         return pattern.matcher(input).matches();
     }
+
+    /**
+     * 判断一个字符串是否再另一个以','逗号分割的字符串中，在返回true，不在返回false
+     * @param searchStr 要查找的字符串
+     * @param sourcesStr 原字符串
+     * @return
+     */
+    public static boolean findInSet(String searchStr,String sourcesStr){
+        String[] sourcesStrArray = sourcesStr.split(",");
+        for (String sourcesS:sourcesStrArray) {
+            if(searchStr.equals(sourcesS)){
+                return true;
+            }
+        }
+        return false;
+    }
 }
