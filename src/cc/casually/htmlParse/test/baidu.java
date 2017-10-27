@@ -15,9 +15,10 @@ public class baidu {
         Response response = HttpClient.post(request);
         String bodyStr = response.getBodyStr();
         Nodes nodes = new Nodes(bodyStr);
-        List<Node> listNode = nodes.getListNodeForTag("img");
+        List<Node> listNode = nodes.getListNodeForTag("a");
         for (Node node:listNode) {
-            System.out.println(node.getContext());
+            System.out.println(node.getTag());
+            System.out.println(node.getText());
             if(node.getAttributeValue("src")!=null){
                 System.out.println(node.getAttributeValue("src"));
             }

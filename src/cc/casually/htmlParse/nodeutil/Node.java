@@ -136,6 +136,18 @@ public class Node {
         return null;
     }
 
+    /**
+     * 获取节点文本信息
+     * @return
+     */
+    public String getText(){
+        String singleTag = "<inpt>,<img>,<meta>,<link>";
+        if(Util.findInSet(getTag(),singleTag)){
+            return getContext();
+        }
+        return getContext().substring(getContext().indexOf(">") + 1,getContext().indexOf("</"));
+    }
+
     @Override
     public String toString() {
         return "Node{" +
