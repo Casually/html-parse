@@ -1,5 +1,10 @@
 package cc.casually.htmlParse.nodeutil;
 
+import cc.casually.htmlParse.http.HttpClient;
+import cc.casually.htmlParse.http.Request;
+import cc.casually.htmlParse.http.Response;
+
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +20,8 @@ public class Nodes {
     private String htmlStrOrPathOrURi = "";
     private List<Node> listNode;
     private Map<String ,List<Node>> mapListNode;
+    private String filePathRegex = "[a-zA-Z]:\\\\.*";
+    private String htmlUriRegex = "(http://|https://).*";
 
     /**
      *
@@ -24,6 +31,27 @@ public class Nodes {
         this.listNode = new ArrayList<Node>();
         this.htmlStrOrPathOrURi = htmlStrOrPathOrURi;
         NodeUtil nodeUtil = new NodeUtil();
+        if(htmlStrOrPathOrURi.matches(htmlUriRegex)){
+            Request request = new Request();
+            request.setUri(htmlStrOrPathOrURi);
+            Response response = HttpClient.post(request);
+            htmlStrOrPathOrURi = response.getBodyStr();
+        }else if(htmlStrOrPathOrURi.matches(filePathRegex)){
+            StringBuilder stringBuilder = new StringBuilder();
+            File file = new File(htmlStrOrPathOrURi);
+            BufferedReader bufread;
+            String read;
+            try{
+                bufread = new BufferedReader(new FileReader(file));
+                while ((read = bufread.readLine()) != null) {
+                    stringBuilder.append(read);
+                }
+                bufread.close();
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+            htmlStrOrPathOrURi = stringBuilder.toString();
+        }
         mapListNode = nodeUtil.getNodeS(htmlStrOrPathOrURi);
         this.listNode = getListNodeAllPr();
     }
