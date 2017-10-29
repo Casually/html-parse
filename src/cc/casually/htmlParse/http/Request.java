@@ -259,6 +259,14 @@ public class Request {
     }
 
     /**
+     * 返回参数JSON格式
+     * @return
+     */
+    public JSONObject getParamJSON(){
+        return new JSONObject(params);
+    }
+
+    /**
      * 设置请求连接
      * @param url
      */

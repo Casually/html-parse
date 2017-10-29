@@ -8,6 +8,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -52,11 +53,17 @@ public class HttpClient {
         HashMap<String, String> header = request.getHeaders();
         Response response = new Response();
         try {
+
+            boolean isLeng = false;
+            if (request.getParamStr().length()>256){
+                isLeng = true;
+            }
+
             if (request.getParams().isEmpty()) {
                 url = request.getUri().toString();
             }
             else {
-                url = String.format("%s?%s", request.getUri().toString(), request.getParamStr());
+                url = isLeng?request.getUri().toString():String.format("%s?%s", request.getUri().toString(), request.getParamStr());
             }
 
             SSLContext sc = SSLContext.getInstance("SSL");
@@ -82,21 +89,30 @@ public class HttpClient {
             for (Map.Entry<String, String> entry : header.entrySet()) {
                 conn.setRequestProperty(entry.getKey(), entry.getValue());
             }
+            conn.setRequestMethod("POST");
+            conn.setRequestProperty("Content-Length", String.valueOf(request.getParamStr().length()));
 
             conn.connect();
             DataOutputStream out = new DataOutputStream(conn.getOutputStream());
             out.write(content.getBytes(charset));
+
+            if (isLeng){
+                out.write(request.getParamStr().getBytes());
+            }
+
             out.flush();
             out.close();
             int statusCode = conn.getResponseCode();
             response.setHeader(conn.getHeaderFields());
             response.setStatus(statusCode);
             response.setCharset(charset);
+            InputStream is;
             if (statusCode != 200) {
-                return response;
+                is = conn.getErrorStream();
+            }else{
+                is = conn.getInputStream();
             }
 
-            InputStream is = conn.getInputStream();
             if (is != null) {
                 ByteArrayOutputStream outStream = new ByteArrayOutputStream();
                 byte[] buffer = new byte[1024];
@@ -168,5 +184,15 @@ public class HttpClient {
             }
         }
         return response;
+    }
+
+    /**
+     * post请求
+     * @param request
+     * @return
+     */
+    public static Response httpPost(Request request){
+
+        return null;
     }
 }
