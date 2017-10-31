@@ -14,11 +14,16 @@ public class test {
      * 第五步：对比数据库数据
      * @param args
      */
-    public static void mai1n(String[] args) {
-        //Response response = new GetFaceSet().getResponse();
-        //Response response =  new Detect("https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1509295274450&di=a89b8f20d1c306d45b75a7ab22325f99&imgtype=0&src=http%3A%2F%2Fmvimg1.meitudata.com%2F56966d570eaba4885.jpg").getResponse();
-        //Response response = new AddFaceToFaceSet("06ee32255b44ba8ebf6541a80da1313e","140323a6b8fe05c686c3f6a78d2436c4").getResponse();
-        Response response = new SearchFaces("https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1509295274450&di=a89b8f20d1c306d45b75a7ab22325f99&imgtype=0&src=http%3A%2F%2Fmvimg1.meitudata.com%2F56966d570eaba4885.jpg","06ee32255b44ba8ebf6541a80da1313e").getResponse();
+    public static void main(String[] args) {
+        Response response =  new FaceDetect("https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1509295274450&di=a89b8f20d1c306d45b75a7ab22325f99&imgtype=0&src=http%3A%2F%2Fmvimg1.meitudata.com%2F56966d570eaba4885.jpg").getResponse();
+        System.out.println(response.getStatus());
+        System.out.println(response.getBodyStr());
+        String face_tokens = response.getBodyJson().getJSONArray("faces").getJSONObject(0).getString("face_token");
+        System.out.println(face_tokens);
+        response = new AddFaceToFaceSet("06ee32255b44ba8ebf6541a80da1313e",face_tokens).getResponse();
+        System.out.println(response.getStatus());
+        System.out.println(response.getBodyStr());
+        response = new SearchFaces("D:\\94cad1c8a786c917dbf06b0cc23d70cf3bc75717.jpg","06ee32255b44ba8ebf6541a80da1313e").getResponse();
         System.out.println(response.getStatus());
         System.out.println(response.getBodyStr());
     }

@@ -4,6 +4,9 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONString;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.*;
 
@@ -67,6 +70,19 @@ public class Response {
         this.body = body;
     }
 
+
+    public void setBody(InputStream inputStream) throws IOException {
+        if (inputStream != null) {
+            ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+            byte[] buffer = new byte[1024];
+            int len = 0;
+            while ((len = inputStream.read(buffer)) != -1) {
+                outStream.write(buffer, 0, len);
+            }
+            inputStream.close();
+            setBody(outStream.toByteArray());
+        }
+    }
     /**
      * 获取编码
      * @return

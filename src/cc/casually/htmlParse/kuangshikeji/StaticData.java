@@ -66,4 +66,14 @@ public class StaticData {
      * 删除人脸信息
      */
     public static final String REMOVE_FACE_URL = " https://api-cn.faceplusplus.com/facepp/v3/faceset/removeface";
+
+    /**
+     * 人体检测
+     */
+    public static final String HUMANBODY_DETECT_URL = "https://api-cn.faceplusplus.com/humanbodypp/v1/detect";
+
+    /**
+     * 人形抠像
+     */
+    public static final String HUMANBODY_SEGMENT_URL = "https://api-cn.faceplusplus.com/humanbodypp/v1/segment";
 }

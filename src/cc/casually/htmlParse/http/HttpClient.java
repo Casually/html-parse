@@ -1,5 +1,19 @@
 package cc.casually.htmlParse.http;
 
+import cc.casually.htmlParse.staticdata.RegexStaticData;
+import org.apache.http.HttpEntity;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.util.EntityUtils;
+
 import javax.net.ssl.*;
 import java.io.*;
 import java.net.*;
@@ -7,8 +21,9 @@ import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -73,6 +88,10 @@ public class HttpClient {
             URL console = new URL(url);
             Proxy proxy = request.getConfig() == null ? Proxy.NO_PROXY : request.getConfig().getProxy();
             HttpURLConnection conn = (HttpURLConnection) console.openConnection(proxy);
+            conn.setDoOutput(true);
+            conn.setUseCaches(false);
+            conn.setRequestMethod("POST");// 设置URL请求方法
+
             if (url.contains("https")) {
                 HttpsURLConnection httpsConn = (HttpsURLConnection) conn;
                 httpsConn.setSSLSocketFactory(sc.getSocketFactory());
@@ -84,20 +103,17 @@ public class HttpClient {
                 conn.setConnectTimeout(request.getConfig().getConnectionTimeoutMillis());
                 conn.setReadTimeout(request.getConfig().getSocketTimeoutMillis());
             }
-            conn.setDoOutput(true);
             // 添加header
             for (Map.Entry<String, String> entry : header.entrySet()) {
                 conn.setRequestProperty(entry.getKey(), entry.getValue());
             }
-            conn.setRequestMethod("POST");
-            conn.setRequestProperty("Content-Length", String.valueOf(request.getParamStr().length()));
 
             conn.connect();
             DataOutputStream out = new DataOutputStream(conn.getOutputStream());
             out.write(content.getBytes(charset));
 
             if (isLeng){
-                out.write(request.getParamStr().getBytes());
+                out.write(request.getParamStr().getBytes(charset));
             }
 
             out.flush();
@@ -114,14 +130,7 @@ public class HttpClient {
             }
 
             if (is != null) {
-                ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-                byte[] buffer = new byte[1024];
-                int len = 0;
-                while ((len = is.read(buffer)) != -1) {
-                    outStream.write(buffer, 0, len);
-                }
-                is.close();
-                response.setBody(outStream.toByteArray());
+                response.setBody(is);
             }
             return response;
         } catch (MalformedURLException e) {
@@ -192,7 +201,67 @@ public class HttpClient {
      * @return
      */
     public static Response httpPost(Request request){
+        Response resultResponse = new Response();
+        CloseableHttpClient httpclient = HttpClients.createDefault();
+        HttpPost httpPost = new HttpPost(request.getUri());
 
-        return null;
+        for (Map.Entry<String,String> entry:request.getHeaders().entrySet()) {
+            httpPost.setHeader(entry.getKey(),entry.getValue());
+        }
+
+        List<NameValuePair> nvps = new ArrayList<>();
+        for (Map.Entry<String, String> entry : request.getParams().entrySet()) {
+            nvps.add(new BasicNameValuePair(entry.getKey(),entry.getValue()));
+        }
+        try {
+            httpPost.setEntity(new UrlEncodedFormEntity(nvps));
+            CloseableHttpResponse response = httpclient.execute(httpPost);
+            int statusCode = response.getStatusLine().getStatusCode();
+            System.out.println(statusCode);
+            HttpEntity entity = response.getEntity();
+            InputStream is = entity.getContent();
+            resultResponse.setBody(is);
+            resultResponse.setStatus(statusCode);
+            EntityUtils.consume(entity);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        } catch (ClientProtocolException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return resultResponse;
+    }
+
+    public static Response postFile(Request request){
+        Response resultResponse = new Response();
+        HttpPost httpPost = new HttpPost(request.getUri());
+        MultipartEntityBuilder builder = MultipartEntityBuilder.create();
+
+        for (Map.Entry<String, String> entry : request.getParams().entrySet()) {
+            String key = entry.getKey();
+            String value = entry.getValue();
+            if(value.matches(RegexStaticData.filePathRegex)){
+                builder.addBinaryBody(key,new File(value));
+            }else {
+                builder.addTextBody(key, value, ContentType.TEXT_PLAIN.withCharset("UTF-8"));
+            }
+        }
+        HttpEntity httpEntity = builder.build();
+        httpPost.setEntity(httpEntity);
+        CloseableHttpClient httpClient = HttpClients.createDefault();
+        try {
+            CloseableHttpResponse response = httpClient.execute(httpPost);
+            int statusCode = response.getStatusLine().getStatusCode();
+            System.out.println(statusCode);
+            HttpEntity entity = response.getEntity();
+            InputStream is = entity.getContent();
+            resultResponse.setBody(is);
+            resultResponse.setStatus(statusCode);
+            EntityUtils.consume(entity);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return resultResponse;
     }
 }

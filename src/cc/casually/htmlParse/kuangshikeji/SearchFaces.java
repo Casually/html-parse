@@ -3,6 +3,8 @@ package cc.casually.htmlParse.kuangshikeji;
 import cc.casually.htmlParse.http.HttpClient;
 import cc.casually.htmlParse.http.Request;
 import cc.casually.htmlParse.http.Response;
+import cc.casually.htmlParse.staticdata.RegexStaticData;
+import org.json.HTTP;
 
 /**
  * 在人脸集合中查找相识度高的脸
@@ -55,9 +57,18 @@ public class SearchFaces implements InterfaceInterchange{
         request.setUri(StaticData.SEARCH_URL);
         request.addParam("api_key",StaticData.API_KEY);
         request.addParam("api_secret",StaticData.API_SECRET);
-        request.addParam("image_url",image_url);
         request.addParam("faceset_token",faceset_token);
-        Response response = HttpClient.post(request);
+        if(image_file.matches(RegexStaticData.filePathRegex)){
+            request.addParam("image_file",image_file);
+            return HttpClient.postFile(request);
+        }else if(image_url.matches(RegexStaticData.htmlUriRegex)){
+            request.addParam("image_url",image_url);
+        }else if(image_base64.startsWith("data:image/")){
+            request.addParam("image_base64",image_base64);
+        }else{
+            request.addHeader("faceset_token",faceset_token);
+        }
+        Response response = HttpClient.httpPost(request);
         return response;
     }
 }
