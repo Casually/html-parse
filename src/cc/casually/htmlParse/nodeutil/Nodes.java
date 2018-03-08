@@ -124,7 +124,7 @@ public class Nodes {
                     String hmeeTag = hmee.getTag();
                     Integer hmeeStart = hmee.getStart();
                     if(hmeTag.equals(hmeeTag) && hmeeStart >= hmeStart){
-                        if(Integer.valueOf(resultNum).equals(Integer.valueOf(startTagNum))){
+                            if(Integer.valueOf(resultNum).equals(Integer.valueOf(startTagNum))){
                             node.setTag(hmsTag);
                             node.setContext(htmlStrOrPathOrURi.substring(hmsStart,hmeeStart + hmee.getTag().length()));
                             listNode.add(node);
