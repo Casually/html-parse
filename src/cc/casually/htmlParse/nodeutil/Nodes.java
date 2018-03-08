@@ -35,10 +35,11 @@ public class Nodes {
             Request request = new Request();
             request.setUri(htmlStrOrPathOrURi);
             Response response = HttpClient.post(request);
-            htmlStrOrPathOrURi = response.getBodyStr();
+            this.htmlStrOrPathOrURi = response.getBodyStr();
         }else if(htmlStrOrPathOrURi.matches(filePathRegex)){
             StringBuilder stringBuilder = new StringBuilder();
-            File file = new File(htmlStrOrPathOrURi);
+            String tmpPath = htmlStrOrPathOrURi;
+            File file = new File(tmpPath);
             BufferedReader bufread;
             String read;
             try{
@@ -50,9 +51,9 @@ public class Nodes {
             }catch (Exception e){
                 e.printStackTrace();
             }
-            htmlStrOrPathOrURi = stringBuilder.toString();
+            this.htmlStrOrPathOrURi = stringBuilder.toString();
         }
-        mapListNode = nodeUtil.getNodeS(htmlStrOrPathOrURi);
+        mapListNode = nodeUtil.getNodeS(this.htmlStrOrPathOrURi);
         this.listNode = getListNodeAllPr();
     }
 
