@@ -184,4 +184,15 @@ public class Util {
         }
         return false;
     }
+
+    /**
+     * 去掉字符串所有空格
+     * @param str
+     * @return
+     */
+    public static String replaceAllSpace(String str){
+        String reg = "\\s+";
+        return str.replaceAll(reg,"");
+    }
+
 }
