@@ -10,17 +10,17 @@ public class StaticData {
     /**
      * api_key
      */
-    public static final String API_KEY = "XqtiJYybaerD7jqbsnQnAxVnyxRQdnUg";
+    public static final String API_KEY = "xxxxxxx";
 
     /**
      * api_secret
      */
-    public static final String API_SECRET = "6nW9Pi9gGyQJrpdHCffVbIhoMcmWnmRR";
+    public static final String API_SECRET = "xxxxxx";
 
     /**
      * outer_id
      */
-    public static final String OUTER_ID = "www_casually_cc";
+    public static final String OUTER_ID = "xxxxxx";
 
     /**
      * 人脸识别url
