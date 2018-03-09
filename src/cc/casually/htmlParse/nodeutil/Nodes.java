@@ -166,7 +166,10 @@ public class Nodes {
                     }
                     startTagNum += tmpDifference;
                 } while (tmpDifference != 0);
-                listNode.add(node);
+
+                if(node.getTag() != null){
+                    listNode.add(node);
+                }
                 /**
                  * 获取头标签和对应的尾标签
                  */
