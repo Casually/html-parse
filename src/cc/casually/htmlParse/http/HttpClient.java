@@ -21,10 +21,7 @@ import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 请求类
@@ -162,14 +159,14 @@ public class HttpClient {
         }else {
             url = String.format("%s?%s", request.getUri().toString(), request.getParamStr());
         }
-        System.out.println("request = [" + url + "]");
-        URL realUrl;
         try {
-            realUrl = new URL(url);
+            URL realUrl = new URL(url);
             URLConnection connection = realUrl.openConnection();
             connection.setRequestProperty("accept", "*/*");
             connection.setRequestProperty("connection", "Keep-Alive");
-            connection.setRequestProperty(Headers.USER_AGENT,"Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36");
+            String userAgent = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36";
+            connection.setRequestProperty(Headers.USER_AGENT,!(request.getHeaders().get(Headers.USER_AGENT) == null)?
+                    request.getHeaders().get(Headers.USER_AGENT):userAgent);
             connection.setRequestProperty(Headers.COOKIE,request.getHeaders().get(Headers.COOKIE));
             connection.connect();
             response.setHeader(connection.getHeaderFields());
@@ -233,35 +230,86 @@ public class HttpClient {
         return resultResponse;
     }
 
-    public static Response postFile(Request request){
+    public static Response postFile(Request request) {
         Response resultResponse = new Response();
         HttpPost httpPost = new HttpPost(request.getUri());
-        MultipartEntityBuilder builder = MultipartEntityBuilder.create();
 
-        for (Map.Entry<String, String> entry : request.getParams().entrySet()) {
-            String key = entry.getKey();
-            String value = entry.getValue();
-            if(value.matches(RegexStaticData.filePathRegex)){
-                builder.addBinaryBody(key,new File(value));
-            }else {
+        Iterator var3 = request.getHeaders().entrySet().iterator();
+
+        while(var3.hasNext()) {
+            Map.Entry<String, String> entry = (Map.Entry)var3.next();
+            httpPost.setHeader((String)entry.getKey(), (String)entry.getValue());
+        }
+
+        MultipartEntityBuilder builder = MultipartEntityBuilder.create();
+        Iterator var4 = request.getParams().entrySet().iterator();
+
+        while(var4.hasNext()) {
+            Map.Entry<String, String> entry = (Map.Entry)var4.next();
+            String key = (String)entry.getKey();
+            String value = (String)entry.getValue();
+            File file = new File(value);
+            if (file.isFile()) {
+                builder.addBinaryBody(key, file);
+            } else {
                 builder.addTextBody(key, value, ContentType.TEXT_PLAIN.withCharset("UTF-8"));
             }
         }
+
         HttpEntity httpEntity = builder.build();
         httpPost.setEntity(httpEntity);
         CloseableHttpClient httpClient = HttpClients.createDefault();
+
         try {
             CloseableHttpResponse response = httpClient.execute(httpPost);
             int statusCode = response.getStatusLine().getStatusCode();
-            System.out.println(statusCode);
             HttpEntity entity = response.getEntity();
             InputStream is = entity.getContent();
             resultResponse.setBody(is);
             resultResponse.setStatus(statusCode);
             EntityUtils.consume(entity);
+        } catch (IOException var10) {
+            var10.printStackTrace();
+        }
+
+        return resultResponse;
+    }
+
+    public static Response doDelete(Request request){
+        Response response = new Response();
+        String result = "";
+        BufferedReader in = null;
+        String url;
+        if (request.getParams().isEmpty()) {
+            url = request.getUri().toString();
+        } else {
+            url = String.format("%s?%s", request.getUri().toString(), request.getParamStr());
+        }
+        try {
+            URL realUrl = new URL(url);
+            HttpURLConnection httpURLConnection = (HttpURLConnection)realUrl.openConnection();
+            httpURLConnection.setDoOutput(true);
+            httpURLConnection.setRequestMethod("DELETE");
+            httpURLConnection.setRequestProperty("User-Agent", "Koala Admin");
+            httpURLConnection.setRequestProperty("Cookie", request.getHeaders().get("Cookie"));
+            httpURLConnection.connect();
+            httpURLConnection.disconnect();
+            response.setHeader(httpURLConnection.getHeaderFields());
+
+            String line;
+            for(in = new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream())); (line = in.readLine()) != null; result = result + line) {
+                ;
+            }
+
+            response.setBody(result.getBytes(request.getContentEncoding()));
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (ProtocolException e) {
+            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return resultResponse;
+        return response;
     }
+
 }

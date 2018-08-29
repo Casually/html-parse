@@ -25,7 +25,7 @@ public class Request {
     public Request() {
         headers = new HashMap<String, String>();
         params =  new HashMap<String, String>();
-        body =  new HashMap<String, Object>();;
+        body =  new HashMap<String, Object>();
         httpMethodName = HttpMethodName.POST;
         bodyFormat = EBodyFormat.FORM_KV;
         contentEncoding = HttpCharacterEncoding.DEFAULT_ENCODING;

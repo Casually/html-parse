@@ -115,7 +115,6 @@ public class Util {
      * @return file bytes
      * @throws IOException 读取文件错误
      */
-
     public static byte[] readFileByBytes(String filePath) throws IOException {
         File file = new File(filePath);
         if (!file.exists()) {
@@ -193,6 +192,27 @@ public class Util {
     public static String replaceAllSpace(String str){
         String reg = "\\s+";
         return str.replaceAll(reg,"");
+    }
+
+    /**
+     * 链接处理
+     * 如果有http/https/ftp/直接返回，否者增加对应的协议头
+     */
+    public static String managerUtlAgreement(String agreement, String url) {
+        if (url.split("://").length >= 2) {
+            url = url.split("://")[1];
+        }
+        return String.format("%s://%s",agreement,url);
+    }
+
+    /**
+     * 处理链接增加http
+     *
+     * @param url
+     * @return
+     */
+    public static String managerUrlAgreementHttp(String url) {
+        return managerUtlAgreement("http", url);
     }
 
 }

@@ -20,13 +20,14 @@ public class Response {
     private String charset;
     private int status;
 
-    public Response(){
+    public Response() {
         status = 0;
         charset = "UTF-8";
     }
 
     /**
      * 获取头信息
+     *
      * @return
      */
     public Map<String, List<String>> getHeader() {
@@ -35,19 +36,21 @@ public class Response {
 
     /**
      * 返回头信息（字符串形式）
+     *
      * @return
      */
-    public String getHeaderStr(){
+    public String getHeaderStr() {
         StringBuffer headerStr = new StringBuffer();
-        for (String key:header.keySet()) {
-            headerStr.append(String.format("%s=%s,",key,header.get(key)));
+        for (String key : header.keySet()) {
+            headerStr.append(String.format("%s=%s,", key, header.get(key)));
         }
-        headerStr.deleteCharAt(headerStr.length()-1);
+        headerStr.deleteCharAt(headerStr.length() - 1);
         return headerStr.toString();
     }
 
     /**
      * 设置头信息
+     *
      * @param header
      */
     public void setHeader(Map<String, List<String>> header) {
@@ -56,6 +59,7 @@ public class Response {
 
     /**
      * 获取body信息（字节码）
+     *
      * @return
      */
     public byte[] getBody() {
@@ -64,6 +68,7 @@ public class Response {
 
     /**
      * 设置body信息
+     *
      * @param body
      */
     public void setBody(byte[] body) {
@@ -83,8 +88,10 @@ public class Response {
             setBody(outStream.toByteArray());
         }
     }
+
     /**
      * 获取编码
+     *
      * @return
      */
     public String getCharset() {
@@ -93,6 +100,7 @@ public class Response {
 
     /**
      * 设置编码
+     *
      * @param charset
      */
     public void setCharset(String charset) {
@@ -101,6 +109,7 @@ public class Response {
 
     /**
      * 获取返回码
+     *
      * @return
      */
     public int getStatus() {
@@ -109,6 +118,7 @@ public class Response {
 
     /**
      * 设置返回码
+     *
      * @param status
      */
     public void setStatus(int status) {
@@ -117,6 +127,7 @@ public class Response {
 
     /**
      * 获取body信息（字符串）
+     *
      * @return
      */
     public String getBodyStr() {
@@ -133,6 +144,7 @@ public class Response {
 
     /**
      * 获取body信息（json格式会抛json解析异常）
+     *
      * @return
      */
     public JSONObject getBodyJson() {
@@ -141,21 +153,43 @@ public class Response {
 
     /**
      * 获取body信息（Map<String,String>格式）
+     *
      * @return
      */
-    public Map<String,String> getBodyMap(){
+    public Map<String, String> getBodyMap() {
         JSONObject jsonObject = new JSONObject(getBodyStr());
-        Map<String,String> result = new HashMap<String, String>();
+        Map<String, String> result = new HashMap<String, String>();
         Iterator iterator = jsonObject.keys();
-        while (iterator.hasNext()){
+        while (iterator.hasNext()) {
             Object key = iterator.next();
-            if(key == null || "".equals(key)){
+            if (key == null || "".equals(key)) {
                 break;
-            }else {
-                Object value = jsonObject.get(key.toString()) != null?jsonObject.get(key.toString()):"";
-                result.put(key.toString(),value.toString());
+            } else {
+                Object value = jsonObject.get(key.toString()) != null ? jsonObject.get(key.toString()) : "";
+                result.put(key.toString(), value.toString());
             }
         }
         return result;
+    }
+
+    /**
+     * 获取body信息（List<Object>）
+     * @return
+     */
+    public List<Object> getBodyList() {
+        JSONArray jsonArray = new JSONArray(getBodyStr());
+        List<Object> lm = new ArrayList<>();
+        for (Object obj : jsonArray) {
+            lm.add(obj);
+        }
+        return lm;
+    }
+
+    /**
+     * 获取body信息（JSONArray）
+     * @return
+     */
+    public JSONArray getBodyJsonArray(){
+        return new JSONArray(getBodyStr());
     }
 }
