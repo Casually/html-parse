@@ -162,12 +162,16 @@ public class HttpClient {
         try {
             URL realUrl = new URL(url);
             URLConnection connection = realUrl.openConnection();
-            connection.setRequestProperty("accept", "*/*");
-            connection.setRequestProperty("connection", "Keep-Alive");
+            HashMap<String,String> headers = request.getHeaders();
+            for (String key:headers.keySet()){
+                connection.setRequestProperty(key,headers.get(key));
+            }
+            //connection.setRequestProperty("accept", "*/*");
+            /*connection.setRequestProperty("connection", "Keep-Alive");
             String userAgent = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36";
             connection.setRequestProperty(Headers.USER_AGENT,!(request.getHeaders().get(Headers.USER_AGENT) == null)?
                     request.getHeaders().get(Headers.USER_AGENT):userAgent);
-            connection.setRequestProperty(Headers.COOKIE,request.getHeaders().get(Headers.COOKIE));
+            connection.setRequestProperty(Headers.COOKIE,request.getHeaders().get(Headers.COOKIE));*/
             connection.connect();
             response.setHeader(connection.getHeaderFields());
             // 定义 BufferedReader输入流来读取URL的响应
@@ -290,8 +294,10 @@ public class HttpClient {
             HttpURLConnection httpURLConnection = (HttpURLConnection)realUrl.openConnection();
             httpURLConnection.setDoOutput(true);
             httpURLConnection.setRequestMethod("DELETE");
-            httpURLConnection.setRequestProperty("User-Agent", "Koala Admin");
-            httpURLConnection.setRequestProperty("Cookie", request.getHeaders().get("Cookie"));
+            HashMap<String,String> headers = request.getHeaders();
+            for (String key:headers.keySet()){
+                httpURLConnection.setRequestProperty(key,headers.get(key));
+            }
             httpURLConnection.connect();
             httpURLConnection.disconnect();
             response.setHeader(httpURLConnection.getHeaderFields());
