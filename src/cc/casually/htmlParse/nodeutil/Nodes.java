@@ -36,7 +36,8 @@ public class Nodes {
             request.setUri(htmlStrOrPathOrURi);
             Response response = HttpClient.post(request);
             this.htmlStrOrPathOrURi = response.getBodyStr();
-        } else if (htmlStrOrPathOrURi.matches(filePathRegex)) {
+        }
+        if (new File(filePathRegex).isFile()) {
             StringBuilder stringBuilder = new StringBuilder();
             String tmpPath = htmlStrOrPathOrURi;
             File file = new File(tmpPath);
